@@ -10,14 +10,10 @@
 
 
 int main(int argc , char *argv[]) {
-    char intranet[] = "/var/www/html/intranet";
-    char live[] = "/var/www/html/live";
-    char bak_loc[] = "/var/backups";
-    char report_loc[] = "/var/reports";
     char key[] = "SystemSoftware-Assignment2";
 
-    openlog(key, LOG_PID|LOG_CONS, LOG_DAEMON);
-    daemonize();
+//    openlog(key, LOG_PID|LOG_CONS, LOG_DAEMON);
+//    daemonize();
 
     int PORT = 5555;
 
