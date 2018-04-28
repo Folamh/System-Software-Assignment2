@@ -4,6 +4,7 @@
 #include <arpa/inet.h> //inet_addr
 #include <stdlib.h>
 #include <libgen.h>
+#include <unistd.h>
 
 int main(int argc , char *argv[]) {
     char HOST[] = "127.0.0.1";
