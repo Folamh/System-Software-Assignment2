@@ -43,7 +43,7 @@ int main(int argc , char *argv[]) {
     server.sin_port = htons(PORT);
 
     //Connect to remote server
-    if (connect(sock , (struct sockaddr *)&server , sizeof(server)) < 0)
+    if (connect(sock, (struct sockaddr *) &server, sizeof(server)) < 0)
     {
         perror("connect failed. Error");
         exit(1);
@@ -51,15 +51,25 @@ int main(int argc , char *argv[]) {
 
     puts("Connected\n");
 
-    if( send(sock , location , strlen(location) , 0) < 0) {
+    if (send(sock , location, strlen(location), 0) < 0) {
         puts("Send failed");
         exit(1);
     }
 
-    if( send(sock , base_name , strlen(base_name) , 0) < 0) {
+    if (recv(sock, server_reply, 2000 , 0) < 0) {
+        puts("recv failed");
+    }
+    puts(server_reply);
+
+    if (send(sock , base_name, strlen(base_name), 0) < 0) {
         puts("Send failed");
         exit(1);
     }
+
+    if (recv(sock, server_reply, 2000 , 0) < 0) {
+        puts("recv failed");
+    }
+    puts(server_reply);
 
     char file_buffer[512];
     printf("[Client] Sending %s to the Server... ", file_name);
@@ -76,13 +86,6 @@ int main(int argc , char *argv[]) {
         bzero(file_buffer, 512);
         i++;
     }
-
-    //Receive a reply from the server
-    if( recv(sock , server_reply , 2000 , 0) < 0) {
-        puts("recv failed");
-    }
-    puts("Server reply :");
-    puts(server_reply);
 
     close(sock);
     exit(0);

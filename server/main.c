@@ -12,8 +12,8 @@
 int main(int argc , char *argv[]) {
     char key[] = "SystemSoftware-Assignment2";
 
-//    openlog(key, LOG_PID|LOG_CONS, LOG_DAEMON);
-//    daemonize();
+    openlog(key, LOG_PID|LOG_CONS, LOG_DAEMON);
+    daemonize();
 
     int PORT = 5555;
 
@@ -22,11 +22,10 @@ int main(int argc , char *argv[]) {
 
     //Create socket
     socket_desc = socket(AF_INET , SOCK_STREAM , 0);
-    if (socket_desc == -1)
-    {
-        printf("Could not create socket");
+    if (socket_desc == -1) {
+        syslog(LOG_ERR, "Unable to create socket.");
     }
-    puts("Socket created");
+    syslog(LOG_INFO, "Socket created.");
 
     //Prepare the sockaddr_in structure
     server.sin_family = AF_INET;
@@ -34,44 +33,38 @@ int main(int argc , char *argv[]) {
     server.sin_port = htons(PORT);
 
     //Bind
-    if( bind(socket_desc,(struct sockaddr *)&server , sizeof(server)) < 0)
-    {
+    if( bind(socket_desc,(struct sockaddr *)&server , sizeof(server)) < 0) {
         //print the error message
         perror("bind failed. Error");
         return 1;
     }
-    puts("bind done");
+    syslog(LOG_INFO, "Bind complete.");
 
     //Listen
     listen(socket_desc , 3);
 
     //Accept and incoming connection
-    puts("Waiting for incoming connections...");
-    c = sizeof(struct sockaddr_in);
-
-
-    //Accept and incoming connection
-    puts("Waiting for incoming connections...");
+    syslog(LOG_INFO, "Waiting for incoming connections...");
     c = sizeof(struct sockaddr_in);
     while((client_sock = accept(socket_desc, (struct sockaddr *) &client, (socklen_t*) &c))) {
-        puts("Connection accepted");
-
+        syslog(LOG_INFO, "Connection accepted.");
         pthread_t sniffer_thread;
         new_sock = malloc(1);
         *new_sock = client_sock;
 
         if (pthread_create( &sniffer_thread , NULL ,  connection_handler , (void*) new_sock) < 0){
-            perror("could not create thread");
+            syslog(LOG_ERR, "Unable to create thread.");
             return 1;
         }
 
         //Now join the thread , so that we dont terminate before the thread
         //pthread_join( sniffer_thread , NULL);
-        puts("Handler assigned");
+        syslog(LOG_INFO, "Handler assigned.");
     }
 
     if (client_sock < 0) {
         perror("accept failed");
+        syslog(LOG_ERR, "Accepting connection failed.");
         return 1;
     }
 

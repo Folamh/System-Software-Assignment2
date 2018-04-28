@@ -1,7 +1,3 @@
-//
-// Created by rmurphy on 28/04/18.
-//
-
 #ifndef INTRANETFILETRANSFER_CONNECTION_HANDLER_H
 #define INTRANETFILETRANSFER_CONNECTION_HANDLER_H
 
@@ -17,15 +13,20 @@ void *connection_handler(void *socket_desc) {
     char* promotions = "/usr/intranet/promotions";
     char* offers = "/usr/intranet/offers";
     char* marketing = "/usr/intranet/marketing";
-    char* file_name = NULL;
+    char* test = "./test/intranet";
+    char file_name[2000];
+
+    puts("in handler");
 
     //Get the socket descriptor
     int sock = *(int*)socket_desc;
     char client_message[2000];
 
+    puts("Get save location");
     if (recv(sock , client_message , 2000 , 0) < 0) {
-        exit(1);
+        puts("failed to receive loc");
     } else {
+        puts(client_message);
         if (strcmp(client_message, "intranet") == 0) {
             strcpy(file_name, intranet);
         } else if (strcmp(client_message, "sales") == 0) {
@@ -36,16 +37,32 @@ void *connection_handler(void *socket_desc) {
             strcpy(file_name, offers);
         } else if (strcmp(client_message, "marketing") == 0) {
             strcpy(file_name, marketing);
+        } else if (strcmp(client_message, "test") == 0) {
+            strcpy(file_name, test);
         } else {
-            exit(1);
+            puts("failed cmp");
         }
     }
 
+    puts(file_name);
+
+    if(send(sock , "OK", strlen("OK") , 0) < 0) {
+        puts("Send failed");
+    }
+
     if (recv(sock , client_message , 2000 , 0) < 0) {
-        exit(1);
+        puts("failed to recv basename");
     } else {
+        puts(client_message);
+        strcat(file_name, "/");
         strcat(file_name, client_message);
     }
+
+    if(send(sock , "OK", strlen("OK") , 0) < 0) {
+        puts("Send failed");
+    }
+
+    puts("Relieving file.");
 
     char file_buffer[512]; // Receiver buffer
 
@@ -70,7 +87,7 @@ void *connection_handler(void *socket_desc) {
     //Free the socket pointer
     free(socket_desc);
 
-    exit(0);
+    return 0;
 }
 
 #endif //INTRANETFILETRANSFER_CONNECTION_HANDLER_H
