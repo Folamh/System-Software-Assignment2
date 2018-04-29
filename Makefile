@@ -39,10 +39,10 @@ cmake_force:
 SHELL = /bin/sh
 
 # The CMake executable.
-CMAKE_COMMAND = /usr/bin/cmake
+CMAKE_COMMAND = /opt/clion/bin/cmake/bin/cmake
 
 # The command to remove a file.
-RM = /usr/bin/cmake -E remove -f
+RM = /opt/clion/bin/cmake/bin/cmake -E remove -f
 
 # Escaping for special characters.
 EQUALS = =
@@ -56,27 +56,27 @@ CMAKE_BINARY_DIR = /home/rmurphy/Projects/IntranetFileTransfer
 #=============================================================================
 # Targets provided globally by CMake.
 
-# Special rule for the target rebuild_cache
-rebuild_cache:
-	@$(CMAKE_COMMAND) -E cmake_echo_color --switch=$(COLOR) --cyan "Running CMake to regenerate build system..."
-	/usr/bin/cmake -H$(CMAKE_SOURCE_DIR) -B$(CMAKE_BINARY_DIR)
-.PHONY : rebuild_cache
-
-# Special rule for the target rebuild_cache
-rebuild_cache/fast: rebuild_cache
-
-.PHONY : rebuild_cache/fast
-
 # Special rule for the target edit_cache
 edit_cache:
-	@$(CMAKE_COMMAND) -E cmake_echo_color --switch=$(COLOR) --cyan "Running CMake cache editor..."
-	/usr/bin/ccmake -H$(CMAKE_SOURCE_DIR) -B$(CMAKE_BINARY_DIR)
+	@$(CMAKE_COMMAND) -E cmake_echo_color --switch=$(COLOR) --cyan "No interactive CMake dialog available..."
+	/opt/clion/bin/cmake/bin/cmake -E echo No\ interactive\ CMake\ dialog\ available.
 .PHONY : edit_cache
 
 # Special rule for the target edit_cache
 edit_cache/fast: edit_cache
 
 .PHONY : edit_cache/fast
+
+# Special rule for the target rebuild_cache
+rebuild_cache:
+	@$(CMAKE_COMMAND) -E cmake_echo_color --switch=$(COLOR) --cyan "Running CMake to regenerate build system..."
+	/opt/clion/bin/cmake/bin/cmake -H$(CMAKE_SOURCE_DIR) -B$(CMAKE_BINARY_DIR)
+.PHONY : rebuild_cache
+
+# Special rule for the target rebuild_cache
+rebuild_cache/fast: rebuild_cache
+
+.PHONY : rebuild_cache/fast
 
 # The main all target
 all: cmake_check_build_system
@@ -111,19 +111,6 @@ depend:
 .PHONY : depend
 
 #=============================================================================
-# Target rules for targets named IntranetFileTransfer
-
-# Build rule for target.
-IntranetFileTransfer: cmake_check_build_system
-	$(MAKE) -f CMakeFiles/Makefile2 IntranetFileTransfer
-.PHONY : IntranetFileTransfer
-
-# fast build rule for target.
-IntranetFileTransfer/fast:
-	$(MAKE) -f CMakeFiles/IntranetFileTransfer.dir/build.make CMakeFiles/IntranetFileTransfer.dir/build
-.PHONY : IntranetFileTransfer/fast
-
-#=============================================================================
 # Target rules for targets named IntranetFileTransferClient
 
 # Build rule for target.
@@ -135,6 +122,19 @@ IntranetFileTransferClient: cmake_check_build_system
 IntranetFileTransferClient/fast:
 	$(MAKE) -f CMakeFiles/IntranetFileTransferClient.dir/build.make CMakeFiles/IntranetFileTransferClient.dir/build
 .PHONY : IntranetFileTransferClient/fast
+
+#=============================================================================
+# Target rules for targets named IntranetFileTransfer
+
+# Build rule for target.
+IntranetFileTransfer: cmake_check_build_system
+	$(MAKE) -f CMakeFiles/Makefile2 IntranetFileTransfer
+.PHONY : IntranetFileTransfer
+
+# fast build rule for target.
+IntranetFileTransfer/fast:
+	$(MAKE) -f CMakeFiles/IntranetFileTransfer.dir/build.make CMakeFiles/IntranetFileTransfer.dir/build
+.PHONY : IntranetFileTransfer/fast
 
 client/main.o: client/main.c.o
 
@@ -196,10 +196,10 @@ help:
 	@echo "... all (the default if no target is provided)"
 	@echo "... clean"
 	@echo "... depend"
-	@echo "... rebuild_cache"
 	@echo "... edit_cache"
-	@echo "... IntranetFileTransfer"
 	@echo "... IntranetFileTransferClient"
+	@echo "... rebuild_cache"
+	@echo "... IntranetFileTransfer"
 	@echo "... client/main.o"
 	@echo "... client/main.i"
 	@echo "... client/main.s"

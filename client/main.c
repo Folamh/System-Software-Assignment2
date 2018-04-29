@@ -32,7 +32,7 @@ int main(int argc , char *argv[]) {
 
     int sock;
     struct sockaddr_in server;
-    char message[1000] , server_reply[2000];
+    char server_reply[2000];
 
     //Create socket
     sock = socket(AF_INET , SOCK_STREAM , 0);
@@ -45,7 +45,7 @@ int main(int argc , char *argv[]) {
 
     server.sin_addr.s_addr = inet_addr(HOST);
     server.sin_family = AF_INET;
-    server.sin_port = htons(PORT);
+    server.sin_port = htons((uint16_t) PORT);
 
     //Connect to remote server
     if (connect(sock, (struct sockaddr *) &server, sizeof(server)) < 0) {

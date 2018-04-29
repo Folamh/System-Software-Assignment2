@@ -7,6 +7,7 @@
 #include <unistd.h>
 #include <stdlib.h>
 #include <syslog.h>
+#include <sys/file.h>
 
 void *connection_handler(void *socket_desc) {
     char* intranet = "/var/www/html/intranet";
@@ -61,20 +62,24 @@ void *connection_handler(void *socket_desc) {
     syslog(LOG_INFO, "Receiving file.");
     char file_buffer[512]; // Receiver buffer
     FILE *file_open = fopen(file_name, "w");
+    while (flock(fileno(file_open), LOCK_EX) != 0) {
+        sleep(1);
+    }
     if(file_open == NULL)
         syslog(LOG_WARNING, "File %s Cannot be opened file on server.", file_name);
     else {
         bzero(file_buffer, 512);
-        int block_size = 0;
+        size_t block_size = 0;
         int i=0;
-        while((block_size = recv(sock, file_buffer, 512, 0)) > 0) {
-            int write_sz = fwrite(file_buffer, sizeof(char), block_size, file_open);
+        while((block_size = (size_t) recv(sock, file_buffer, 512, 0)) > 0) {
+            fwrite(file_buffer, sizeof(char), block_size, file_open);
             bzero(file_buffer, 512);
             i++;
         }
     }
     syslog(LOG_INFO, "Transfer Complete.");
     fclose(file_open);
+    flock(fileno(file_open), LOCK_UN);
 
     //Free the socket pointer
     free(socket_desc);
