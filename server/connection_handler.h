@@ -8,11 +8,6 @@
 #include <stdlib.h>
 #include <syslog.h>
 #include <sys/file.h>
-#include <shadow.h>
-#include <pwd.h>
-#include <crypt.h>
-#include <errno.h>
-#include <stdbool.h>
 
 void *connection_handler(void *socket_desc) {
     char* intranet = "/var/www/html/intranet";
@@ -25,54 +20,6 @@ void *connection_handler(void *socket_desc) {
     //Get the socket descriptor
     int sock = *(int*)socket_desc;
     char client_message[2000];
-
-    // Login
-    if (recv(sock , client_message , 2000 , 0) < 0) {
-        pthread_exit(NULL);
-    } else {
-        char *token, *username, *password, *encrypted, *p;
-        struct passwd *pwd;
-        struct spwd *spwd;
-        bool authOk;
-
-        token = strtok(client_message, ":");
-        username = token;
-        puts(username);
-        token = strtok(NULL, ":");
-        password = token;
-
-        for (p = token; *p != '\0'; )
-            *p++ = '\0';
-
-        pwd = getpwnam(username);
-        if (pwd == NULL)
-            pthread_exit(NULL);
-        spwd = getspnam(username);
-        if (spwd == NULL && errno == EACCES)
-            pthread_exit(NULL);
-
-        if (spwd != NULL) // If there is a shadow password record
-            pwd->pw_passwd = spwd->sp_pwdp;     // Use the shadow password
-
-        // Encrypt password and erase cleartext version immediately
-
-        encrypted = crypt(password, pwd->pw_passwd);
-        for (p = password; *p != '\0'; )
-            *p++ = '\0';
-
-        if (encrypted == NULL)
-            pthread_exit(NULL);
-
-        authOk = strcmp(encrypted, pwd->pw_passwd) == 0;
-        if (!authOk) {
-            pthread_exit(NULL);
-        }
-    }
-
-    if(send(sock , "OK", strlen("OK") , 0) < 0) {
-        syslog(LOG_WARNING, "Sending OK signal failed.");
-        pthread_exit(NULL);
-    }
 
     // Location
     if (recv(sock , client_message , 2000 , 0) < 0) {
