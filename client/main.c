@@ -57,6 +57,33 @@ int main(int argc , char *argv[]) {
     syslog(LOG_INFO, "Connected to server.");
     puts("Connected to server.");
 
+    char username[300];
+    printf("Username: ");
+    fflush(stdout);
+    if (fgets(username, 300, stdin) == NULL)
+        exit(EXIT_FAILURE);
+
+    strcat(username, ":");
+    strcat(username, getpass("Password: "));
+
+    // Login
+    if (send(sock , username, strlen(username), 0) < 0) {
+        memset(&username[0], 0, sizeof(username));
+        exit(EXIT_FAILURE);
+    }
+    memset(&username[0], 0, sizeof(username));
+
+    if (recv(sock, server_reply, 2000 , 0) < 0) {
+        syslog(LOG_ERR, "Failed to retrieve confirmation from server.");
+        puts("Failed to retrieve confirmation from server. Exiting...");
+        exit(EXIT_FAILURE);
+    }
+    if (strcmp(server_reply, "OK") != 0) {
+        puts("Incorrect login.");
+        exit(EXIT_FAILURE);
+    }
+
+    // Save location
     if (send(sock , location, strlen(location), 0) < 0) {
         syslog(LOG_ERR, "Error sending save location to server.");
         puts("Error sending save location to server. Exiting...");
@@ -74,6 +101,7 @@ int main(int argc , char *argv[]) {
         exit(EXIT_FAILURE);
     }
 
+    // Filename
     if (send(sock , base_name, strlen(base_name), 0) < 0) {
         syslog(LOG_ERR, "Error sending save location to server.");
         puts("Error sending save location to server.");
@@ -91,6 +119,7 @@ int main(int argc , char *argv[]) {
         exit(EXIT_FAILURE);
     }
 
+    // File
     char file_buffer[512];
     syslog(LOG_INFO, "Sending %s to the Server... ", file_name);
     printf("Sending %s to the Server...\n", file_name);
