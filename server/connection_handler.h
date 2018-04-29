@@ -6,6 +6,7 @@
 #include <sys/socket.h>
 #include <unistd.h>
 #include <stdlib.h>
+#include <syslog.h>
 
 void *connection_handler(void *socket_desc) {
     char* intranet = "/var/www/html/intranet";
@@ -13,18 +14,14 @@ void *connection_handler(void *socket_desc) {
     char* promotions = "/usr/intranet/promotions";
     char* offers = "/usr/intranet/offers";
     char* marketing = "/usr/intranet/marketing";
-    char* test = "./test/intranet";
     char file_name[2000];
-
-    puts("in handler");
 
     //Get the socket descriptor
     int sock = *(int*)socket_desc;
     char client_message[2000];
-
-    puts("Get save location");
     if (recv(sock , client_message , 2000 , 0) < 0) {
-        puts("failed to receive loc");
+        syslog(LOG_WARNING, "Failed to retrieve location to save.");
+        pthread_exit(NULL);
     } else {
         puts(client_message);
         if (strcmp(client_message, "intranet") == 0) {
@@ -37,17 +34,16 @@ void *connection_handler(void *socket_desc) {
             strcpy(file_name, offers);
         } else if (strcmp(client_message, "marketing") == 0) {
             strcpy(file_name, marketing);
-        } else if (strcmp(client_message, "test") == 0) {
-            strcpy(file_name, test);
         } else {
-            puts("failed cmp");
+            syslog(LOG_WARNING, "Failed to retrieve location to save.");
+            pthread_exit(NULL);
         }
     }
 
     puts(file_name);
 
     if(send(sock , "OK", strlen("OK") , 0) < 0) {
-        puts("Send failed");
+        syslog(LOG_WARNING, "Sending OK signal failed.");
     }
 
     if (recv(sock , client_message , 2000 , 0) < 0) {
@@ -59,29 +55,25 @@ void *connection_handler(void *socket_desc) {
     }
 
     if(send(sock , "OK", strlen("OK") , 0) < 0) {
-        puts("Send failed");
+        syslog(LOG_WARNING, "Sending OK signal failed.");
     }
 
-    puts("Relieving file.");
-
+    syslog(LOG_INFO, "Receiving file.");
     char file_buffer[512]; // Receiver buffer
-
     FILE *file_open = fopen(file_name, "w");
     if(file_open == NULL)
-        printf("File %s Cannot be opened file on server.\n", file_name);
+        syslog(LOG_WARNING, "File %s Cannot be opened file on server.", file_name);
     else {
         bzero(file_buffer, 512);
         int block_size = 0;
         int i=0;
         while((block_size = recv(sock, file_buffer, 512, 0)) > 0) {
-            printf("Data Received %d = %d\n",i,block_size);
             int write_sz = fwrite(file_buffer, sizeof(char), block_size, file_open);
             bzero(file_buffer, 512);
             i++;
         }
-
     }
-    printf("Transfer Complete!\n");
+    syslog(LOG_INFO, "Transfer Complete.");
     fclose(file_open);
 
     //Free the socket pointer

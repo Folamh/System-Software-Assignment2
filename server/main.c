@@ -8,7 +8,6 @@
 #include "connection_handler.h"
 #include "daemonize.h"
 
-
 int main(int argc , char *argv[]) {
     char key[] = "SystemSoftware-Assignment2";
 
@@ -35,8 +34,8 @@ int main(int argc , char *argv[]) {
     //Bind
     if( bind(socket_desc,(struct sockaddr *)&server , sizeof(server)) < 0) {
         //print the error message
-        perror("bind failed. Error");
-        return 1;
+        syslog(LOG_ERR, "Binding failed.");
+        exit(EXIT_FAILURE);
     }
     syslog(LOG_INFO, "Bind complete.");
 
@@ -52,20 +51,16 @@ int main(int argc , char *argv[]) {
         new_sock = malloc(1);
         *new_sock = client_sock;
 
-        if (pthread_create( &sniffer_thread , NULL ,  connection_handler , (void*) new_sock) < 0){
+        if (pthread_create( &sniffer_thread , NULL ,  connection_handler , (void*) new_sock) < 0) {
             syslog(LOG_ERR, "Unable to create thread.");
-            return 1;
+            exit(EXIT_FAILURE);
         }
-
-        //Now join the thread , so that we dont terminate before the thread
-        //pthread_join( sniffer_thread , NULL);
         syslog(LOG_INFO, "Handler assigned.");
     }
 
     if (client_sock < 0) {
-        perror("accept failed");
         syslog(LOG_ERR, "Accepting connection failed.");
-        return 1;
+        exit(EXIT_FAILURE);
     }
 
     return 0;
