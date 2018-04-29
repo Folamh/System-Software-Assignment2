@@ -111,17 +111,17 @@ depend:
 .PHONY : depend
 
 #=============================================================================
-# Target rules for targets named IntranetFileTransferClient
+# Target rules for targets named ift
 
 # Build rule for target.
-IntranetFileTransferClient: cmake_check_build_system
-	$(MAKE) -f CMakeFiles/Makefile2 IntranetFileTransferClient
-.PHONY : IntranetFileTransferClient
+ift: cmake_check_build_system
+	$(MAKE) -f CMakeFiles/Makefile2 ift
+.PHONY : ift
 
 # fast build rule for target.
-IntranetFileTransferClient/fast:
-	$(MAKE) -f CMakeFiles/IntranetFileTransferClient.dir/build.make CMakeFiles/IntranetFileTransferClient.dir/build
-.PHONY : IntranetFileTransferClient/fast
+ift/fast:
+	$(MAKE) -f CMakeFiles/ift.dir/build.make CMakeFiles/ift.dir/build
+.PHONY : ift/fast
 
 #=============================================================================
 # Target rules for targets named IntranetFileTransfer
@@ -142,7 +142,7 @@ client/main.o: client/main.c.o
 
 # target to build an object file
 client/main.c.o:
-	$(MAKE) -f CMakeFiles/IntranetFileTransferClient.dir/build.make CMakeFiles/IntranetFileTransferClient.dir/client/main.c.o
+	$(MAKE) -f CMakeFiles/ift.dir/build.make CMakeFiles/ift.dir/client/main.c.o
 .PHONY : client/main.c.o
 
 client/main.i: client/main.c.i
@@ -151,7 +151,7 @@ client/main.i: client/main.c.i
 
 # target to preprocess a source file
 client/main.c.i:
-	$(MAKE) -f CMakeFiles/IntranetFileTransferClient.dir/build.make CMakeFiles/IntranetFileTransferClient.dir/client/main.c.i
+	$(MAKE) -f CMakeFiles/ift.dir/build.make CMakeFiles/ift.dir/client/main.c.i
 .PHONY : client/main.c.i
 
 client/main.s: client/main.c.s
@@ -160,7 +160,7 @@ client/main.s: client/main.c.s
 
 # target to generate assembly for a file
 client/main.c.s:
-	$(MAKE) -f CMakeFiles/IntranetFileTransferClient.dir/build.make CMakeFiles/IntranetFileTransferClient.dir/client/main.c.s
+	$(MAKE) -f CMakeFiles/ift.dir/build.make CMakeFiles/ift.dir/client/main.c.s
 .PHONY : client/main.c.s
 
 server/main.o: server/main.c.o
@@ -197,7 +197,7 @@ help:
 	@echo "... clean"
 	@echo "... depend"
 	@echo "... edit_cache"
-	@echo "... IntranetFileTransferClient"
+	@echo "... ift"
 	@echo "... rebuild_cache"
 	@echo "... IntranetFileTransfer"
 	@echo "... client/main.o"
