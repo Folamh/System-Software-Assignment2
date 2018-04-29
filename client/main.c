@@ -5,10 +5,14 @@
 #include <stdlib.h>
 #include <libgen.h>
 #include <unistd.h>
+#include <syslog.h>
 
 int main(int argc , char *argv[]) {
     char HOST[] = "127.0.0.1";
     int PORT = 5555;
+
+    char key[] = "SystemSoftware-Assignment2-Client";
+    openlog(key, LOG_PID|LOG_CONS, LOG_USER);
 
     // Help
     if (argc == 1 || argc > 3 || strcmp(argv[1], "--help") == 0 || strcmp(argv[2], "-h") == 0) {
@@ -32,47 +36,64 @@ int main(int argc , char *argv[]) {
 
     //Create socket
     sock = socket(AF_INET , SOCK_STREAM , 0);
-    if (sock == -1)
-    {
-        printf("Could not create socket");
+    if (sock == -1) {
+        syslog(LOG_ERR, "Unable to create socket.");
+        puts("Unable to create socket. Exiting...");
+        exit(EXIT_FAILURE);
     }
-    puts("Socket created");
+    syslog(LOG_INFO, "Socket created.");
 
     server.sin_addr.s_addr = inet_addr(HOST);
     server.sin_family = AF_INET;
     server.sin_port = htons(PORT);
 
     //Connect to remote server
-    if (connect(sock, (struct sockaddr *) &server, sizeof(server)) < 0)
-    {
-        perror("connect failed. Error");
-        exit(1);
+    if (connect(sock, (struct sockaddr *) &server, sizeof(server)) < 0) {
+        syslog(LOG_ERR, "Failed to connect to server.");
+        puts("Failed to connect to server. Exiting...");
+        exit(EXIT_FAILURE);
     }
 
-    puts("Connected\n");
+    syslog(LOG_INFO, "Connected to server.");
+    puts("Connected to server.");
 
     if (send(sock , location, strlen(location), 0) < 0) {
-        puts("Send failed");
-        exit(1);
+        syslog(LOG_ERR, "Error sending save location to server.");
+        puts("Error sending save location to server. Exiting...");
+        exit(EXIT_FAILURE);
     }
 
     if (recv(sock, server_reply, 2000 , 0) < 0) {
-        puts("recv failed");
+        syslog(LOG_ERR, "Failed to retrieve confirmation from server.");
+        puts("Failed to retrieve confirmation from server. Exiting...");
+        exit(EXIT_FAILURE);
     }
-    puts(server_reply);
+    if (strcmp(server_reply, "OK") != 0) {
+        syslog(LOG_ERR, "Retrieved incorrect confirmation from server.");
+        puts("Retrieved incorrect confirmation from server. Exiting...");
+        exit(EXIT_FAILURE);
+    }
 
     if (send(sock , base_name, strlen(base_name), 0) < 0) {
-        puts("Send failed");
-        exit(1);
+        syslog(LOG_ERR, "Error sending save location to server.");
+        puts("Error sending save location to server.");
+        exit(EXIT_FAILURE);
     }
 
     if (recv(sock, server_reply, 2000 , 0) < 0) {
-        puts("recv failed");
+        syslog(LOG_ERR, "Failed to retrieve confirmation from server.");
+        puts("Failed to retrieve confirmation from server. Exiting...");
+        exit(EXIT_FAILURE);
     }
-    puts(server_reply);
+    if (strcmp(server_reply, "OK") != 0) {
+        syslog(LOG_ERR, "Retrieved incorrect confirmation from server.");
+        puts("Retrieved incorrect confirmation from server. Exiting...");
+        exit(EXIT_FAILURE);
+    }
 
     char file_buffer[512];
-    printf("[Client] Sending %s to the Server... ", file_name);
+    syslog(LOG_INFO, "Sending %s to the Server... ", file_name);
+    printf("Sending %s to the Server...\n", file_name);
     FILE *file_open = fopen(file_name, "r");
     bzero(file_buffer, 512);
     size_t block_size;
@@ -80,13 +101,16 @@ int main(int argc , char *argv[]) {
     while((block_size = fread(file_buffer, sizeof(char), 512, file_open)) > 0) {
         printf("Data Sent %d = %zu\n", i, block_size);
         if(send(sock, file_buffer, block_size, 0) < 0) {
-            puts("Send failed");
-            exit(1);
+            syslog(LOG_ERR, "Error sending file to server.");
+            puts("Error sending file to server.");
+            exit(EXIT_FAILURE);
         }
         bzero(file_buffer, 512);
         i++;
     }
 
     close(sock);
+    syslog(LOG_ERR, "Sent file to server.");
+    puts("Sent file to server.");
     exit(0);
 }
