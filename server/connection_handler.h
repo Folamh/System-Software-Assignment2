@@ -33,11 +33,6 @@ void *connection_handler(void *socket_desc) {
         return(NULL);
     }
 
-    if(send(sock , "hello", strlen("hello") , 0) < 0) {
-        syslog(LOG_WARNING, "Sending OK signal failed.");
-        return(NULL);
-    }
-
     char* username = strtok(client_message, ":");
 
     char* password = strtok(NULL, ":");
@@ -58,6 +53,11 @@ void *connection_handler(void *socket_desc) {
             syslog(LOG_WARNING, "Sending FAIL-User signal failed.");
             return(NULL);
         }
+        return(NULL);
+    }
+
+    if(send(sock , "OK", strlen("OK") , 0) < 0) {
+        syslog(LOG_WARNING, "Sending OK signal failed.");
         return(NULL);
     }
 
