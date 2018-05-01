@@ -70,6 +70,7 @@ int main(int argc , char *argv[]) {
     puts(user);
 
     // Login
+    puts("Sending user");
     if (send(sock , user, strlen(user), 0) < 0) {
         syslog(LOG_ERR, "Failed to send user to server.");
         puts("Failed to send user to server. Exiting...");
@@ -88,6 +89,7 @@ int main(int argc , char *argv[]) {
     }
 
     // Save location
+    puts("Sending location.");
     if (send(sock , location, strlen(location), 0) < 0) {
         syslog(LOG_ERR, "Error sending save location to server.");
         puts("Error sending save location to server. Exiting...");

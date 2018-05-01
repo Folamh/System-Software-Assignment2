@@ -12,108 +12,88 @@
 #include <shadow.h>
 
 void *connection_handler(void *socket_desc) {
-    char *intranet = "/var/www/html/intranet";
-    char *sales = "/usr/intranet/sales";
-    char *promotions = "/usr/intranet/promotions";
-    char *offers = "/usr/intranet/offers";
-    char *marketing = "/usr/intranet/marketing";
+    char* intranet = "/var/www/html/intranet";
+    char* sales = "/usr/intranet/sales";
+    char* promotions = "/usr/intranet/promotions";
+    char* offers = "/usr/intranet/offers";
+    char* marketing = "/usr/intranet/marketing";
     char file_name[2000];
 
     //Get the socket descriptor
-    int sock = *(int *) socket_desc;
+    int sock = *(int*)socket_desc;
     char client_message[2000];
 
     // Username
-    if (recv(sock, client_message, 2000, 0) < 0) {
+    if (recv(sock , client_message , 2000 , 0) < 0) {
         syslog(LOG_WARNING, "Failed to retrieve user.");
-        if (send(sock, "FAIL-Login", strlen("FAIL-Login"), 0) < 0) {
+        if(send(sock , "FAIL-Login", strlen("FAIL-Login") , 0) < 0) {
             syslog(LOG_WARNING, "Sending FAIL-Login signal failed.");
-            return (NULL);
+            return(NULL);
         }
-        return (NULL);
+        return(NULL);
     }
 
     char token[300];
     strcpy(token, client_message);
 
-    char *username = strtok(token, ":");
+    char* username = strtok(token, ":");
 
-    char *password = strtok(NULL, ":");
+    char* password = strtok(NULL, ":");
 
-    struct spwd *sp;
+    struct spwd* sp;
 
 
-    if ((sp = getspnam(username)) == NULL) {
-        return (NULL);
+    if( ( sp = getspnam(username) ) == NULL) {
+        return(NULL);
     }
     char *result;
     int ok;
     result = crypt(password, sp->sp_pwdp);
-    ok = strcmp(result, sp->sp_pwdp);
-    if (ok != 0) {
-        puts("Access denied\n");
+    ok = strcmp (result, sp->sp_pwdp);
+    if ( ok != 0 ) {
+        puts ("Access denied\n");
         syslog(LOG_WARNING, "Failed to retrieve user.");
-        if (send(sock, "FAIL-User", strlen("FAIL-User"), 0) < 0) {
+        if(send(sock , "FAIL-User", strlen("FAIL-User") , 0) < 0) {
             syslog(LOG_WARNING, "Sending FAIL-User signal failed.");
-            return (NULL);
+            return(NULL);
         }
-        return (NULL);
+        return(NULL);
     }
 
-    if (send(sock, "OK", strlen("OK"), 0) < 0) {
+    if(send(sock , "OK", strlen("OK") , 0) < 0) {
         syslog(LOG_WARNING, "Sending OK signal failed.");
-        return (NULL);
+        return(NULL);
     }
 
     // Location
-    if (recv(sock, client_message, 2000, 0) < 0) {
+    if (recv(sock , client_message , 2000 , 0) < 0) {
         syslog(LOG_WARNING, "Failed to retrieve location to save.");
         syslog(LOG_WARNING, "Failed to retrieve user.");
-        if (send(sock, "FAIL-Location", strlen("FAIL-Location"), 0) < 0) {
+        if(send(sock , "FAIL-Location", strlen("FAIL-Location") , 0) < 0) {
             syslog(LOG_WARNING, "Sending FAIL-Location signal failed.");
-            return (NULL);
+            return(NULL);
         }
-        return (NULL);
+        return(NULL);
     }
 
-    strcpy(client_message, "\0");
-    int i = 0;
-    do {
-        if (recv(sock, client_message, 2000, 0) < 0) {
-            syslog(LOG_WARNING, "Failed to retrieve location to save.");
-            syslog(LOG_WARNING, "Failed to retrieve user.");
-            if (send(sock, "FAIL-Location", strlen("FAIL-Location"), 0) < 0) {
-                syslog(LOG_WARNING, "Sending FAIL-Location signal failed.");
-                return (NULL);
-            }
-            return (NULL);
-        }
-        syslog(LOG_DEBUG, "%s", client_message);
-        if (strcmp(client_message, "intranet") == 0) {
-            strcpy(file_name, intranet);
-            break;
-        } else if (strcmp(client_message, "sales") == 0) {
-            strcpy(file_name, sales);
-            break;
-        } else if (strcmp(client_message, "promotions") == 0) {
-            strcpy(file_name, promotions);
-            break;
-        } else if (strcmp(client_message, "offers") == 0) {
-            strcpy(file_name, offers);
-            break;
-        } else if (strcmp(client_message, "marketing") == 0) {
-            strcpy(file_name, marketing);
-            break;
-        }
-        i++;
-    } while (i < 5);
-
-    if (i >= 5) {
+    syslog(LOG_DEBUG, "%s", client_message);
+    if (strcmp(client_message, "intranet") == 0) {
+        strcpy(file_name, intranet);
+    } else if (strcmp(client_message, "sales") == 0) {
+        strcpy(file_name, sales);
+    } else if (strcmp(client_message, "promotions") == 0) {
+        strcpy(file_name, promotions);
+    } else if (strcmp(client_message, "offers") == 0) {
+        strcpy(file_name, offers);
+    } else if (strcmp(client_message, "marketing") == 0) {
+        strcpy(file_name, marketing);
+    } else {
         syslog(LOG_WARNING, "Incorrect location.");
-        if (send(sock, "FAIL", strlen("FAIL"), 0) < 0) {
+        if(send(sock , "FAIL", strlen("FAIL") , 0) < 0) {
             syslog(LOG_WARNING, "Sending FAIL signal failed.");
-            return (NULL);
+            return(NULL);
         }
+        return(NULL);
     }
 
     if(send(sock , "OK", strlen("OK") , 0) < 0) {
