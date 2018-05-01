@@ -45,22 +45,18 @@ int main(int argc , char *argv[]) {
     //Accept and incoming connection
     syslog(LOG_INFO, "Waiting for incoming connections...");
     c = sizeof(struct sockaddr_in);
-    client_sock = accept(socket_desc, (struct sockaddr *) &client, (socklen_t*) &c);
-    new_sock = malloc(1);
-    *new_sock = client_sock;
-    connection_handler((void*) new_sock);
-//    while((client_sock = accept(socket_desc, (struct sockaddr *) &client, (socklen_t*) &c))) {
-//        syslog(LOG_INFO, "Connection accepted.");
-//        pthread_t sniffer_thread;
-//        new_sock = malloc(1);
-//        *new_sock = client_sock;
-//
-//        if (pthread_create(&sniffer_thread, NULL, connection_handler, (void*) new_sock) < 0) {
-//            syslog(LOG_ERR, "Unable to create thread.");
-//            exit(EXIT_FAILURE);
-//        }
-//        syslog(LOG_INFO, "Handler assigned.");
-//    }
+    while((client_sock = accept(socket_desc, (struct sockaddr *) &client, (socklen_t*) &c))) {
+        syslog(LOG_INFO, "Connection accepted.");
+        pthread_t sniffer_thread;
+        new_sock = malloc(1);
+        *new_sock = client_sock;
+
+        if (pthread_create(&sniffer_thread, NULL, connection_handler, (void*) new_sock) < 0) {
+            syslog(LOG_ERR, "Unable to create thread.");
+            exit(EXIT_FAILURE);
+        }
+        syslog(LOG_INFO, "Handler assigned.");
+    }
 
     if (client_sock < 0) {
         syslog(LOG_ERR, "Accepting connection failed.");

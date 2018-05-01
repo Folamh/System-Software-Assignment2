@@ -11,9 +11,6 @@ int main(int argc , char *argv[]) {
     char HOST[] = "127.0.0.1";
     int PORT = 5555;
 
-    char key[] = "SystemSoftware-Assignment2-Client";
-    openlog(key, LOG_PID|LOG_CONS, LOG_USER);
-
     // Help
     if (argc == 1 || argc > 3 || strcmp(argv[1], "--help") == 0 || strcmp(argv[2], "-h") == 0) {
         printf("Usage: ift <location> <file>\n"
@@ -37,7 +34,6 @@ int main(int argc , char *argv[]) {
     //Create socket
     sock = socket(AF_INET , SOCK_STREAM , 0);
     if (sock == -1) {
-        syslog(LOG_ERR, "Unable to create socket.");
         puts("Unable to create socket. Exiting...");
         exit(EXIT_FAILURE);
     }
@@ -49,12 +45,9 @@ int main(int argc , char *argv[]) {
 
     //Connect to remote server
     if (connect(sock, (struct sockaddr *) &server, sizeof(server)) < 0) {
-        syslog(LOG_ERR, "Failed to connect to server.");
         puts("Failed to connect to server. Exiting...");
         exit(EXIT_FAILURE);
     }
-
-    syslog(LOG_INFO, "Connected to server.");
     puts("Connected to server.");
 
     char user[300];
@@ -68,16 +61,16 @@ int main(int argc , char *argv[]) {
 
     puts(message);
     if (send(sock , message, strlen(message), 0) < 0) {
-        syslog(LOG_ERR, "Failed to send user to server.");
         puts("Failed to send user to server. Exiting...");
         exit(EXIT_FAILURE);
     }
 
     if (recv(sock, server_reply, 2000 , 0) < 0) {
-        syslog(LOG_ERR, "Failed to retrieve confirmation from server.");
         puts("Failed to retrieve confirmation from server. Exiting...");
         exit(EXIT_FAILURE);
     }
+
+    puts(server_reply);
 
     // File
     char file_buffer[512];
@@ -87,11 +80,9 @@ int main(int argc , char *argv[]) {
     bzero(file_buffer, 512);
     size_t block_size;
     int i = 0;
-    puts("inits ok");
     while((block_size = fread(file_buffer, sizeof(char), 512, file_open)) > 0) {
         printf("Data Sent %d = %zu\n", i, block_size);
         if(send(sock, file_buffer, block_size, 0) < 0) {
-            syslog(LOG_ERR, "Error sending file to server.");
             puts("Error sending file to server.");
             exit(EXIT_FAILURE);
         }
@@ -100,7 +91,6 @@ int main(int argc , char *argv[]) {
     }
 
     close(sock);
-    syslog(LOG_ERR, "Sent file to server.");
     puts("Sent file to server.");
     exit(0);
 }

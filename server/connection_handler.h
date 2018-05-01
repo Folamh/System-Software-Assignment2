@@ -41,11 +41,6 @@ void *connection_handler(void *socket_desc) {
     char* password = strtok(NULL, ":");
     char* location = strtok(NULL, ":");
     char* file = strtok(NULL, ":");
-    puts(username);
-    puts(password);
-    puts(location);
-    puts(file);
-
 
     if( ( sp = getspnam(username) ) == NULL) {
         return(NULL);
@@ -55,10 +50,9 @@ void *connection_handler(void *socket_desc) {
     result = crypt(password, sp->sp_pwdp);
     ok = strcmp (result, sp->sp_pwdp);
     if ( ok != 0 ) {
-        puts ("Access denied");
+        syslog(LOG_ERR, "Access denied.");
         return(NULL);
     }
-    puts("Access granted.");
 
     if (strcmp(location, "intranet") == 0) {
         strcpy(file_name, intranet);
@@ -74,21 +68,18 @@ void *connection_handler(void *socket_desc) {
     strcat(file_name, "/");
     strcat(file_name, file);
 
-    puts(file_name);
-
-    if(send(sock , "OK", strlen("OK") , 0) < 0) {
-        syslog(LOG_WARNING, "Sending OK signal failed.");
+    if(send(sock , "Authorized.", strlen("Authorized.") , 0) < 0) {
+        syslog(LOG_WARNING, "Sending authorized signal failed.");
           return(NULL);
     }
-    puts("Sent ok");
 
     // File
     syslog(LOG_INFO, "Receiving file.");
     char file_buffer[512]; // Receiver buffer
     FILE *file_open = fopen(file_name, "w");
-//    while (flock(fileno(file_open), LOCK_EX) != 0) {
-//        sleep(1);
-//    }
+    while (flock(fileno(file_open), LOCK_EX) != 0) {
+        sleep(1);
+    }
     if(file_open == NULL)
         syslog(LOG_WARNING, "File %s Cannot be opened file on server.", file_name);
     else {
@@ -103,13 +94,13 @@ void *connection_handler(void *socket_desc) {
         }
         syslog(LOG_INFO, "Transfer Complete.");
     }
-//    flock(fileno(file_open), LOCK_UN);
+    flock(fileno(file_open), LOCK_UN);
     fclose(file_open);
 
     //Free the socket pointer
     free(socket_desc);
 
-      return(NULL);
+    return(NULL);
 }
 
 #endif //INTRANETFILETRANSFER_CONNECTION_HANDLER_H
