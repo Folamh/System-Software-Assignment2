@@ -33,7 +33,10 @@ void *connection_handler(void *socket_desc) {
         return(NULL);
     }
 
-    char* username = strtok(client_message, ":");
+    char* token;
+    strcpy(token, client_message);
+
+    char* username = strtok(token, ":");
 
     char* password = strtok(NULL, ":");
 
@@ -71,7 +74,7 @@ void *connection_handler(void *socket_desc) {
         }
         return(NULL);
     } else {
-        puts(client_message);
+        syslog(LOG_DEBUG, client_message);
         if (strcmp(client_message, "intranet") == 0) {
             strcpy(file_name, intranet);
         } else if (strcmp(client_message, "sales") == 0) {
@@ -84,7 +87,6 @@ void *connection_handler(void *socket_desc) {
             strcpy(file_name, marketing);
         } else {
             syslog(LOG_WARNING, "Incorrect location.");
-            syslog(LOG_WARNING, "Incorrect location");
             if(send(sock , "FAIL", strlen("FAIL") , 0) < 0) {
                 syslog(LOG_WARNING, "Sending FAIL signal failed.");
                 return(NULL);
@@ -103,6 +105,7 @@ void *connection_handler(void *socket_desc) {
         syslog(LOG_WARNING, "Failed to retrieve filename.");
           return(NULL);
     } else {
+        syslog(LOG_DEBUG, client_message);
         strcat(file_name, "/");
         strcat(file_name, client_message);
     }

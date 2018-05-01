@@ -71,12 +71,10 @@ int main(int argc , char *argv[]) {
 
     // Login
     if (send(sock , user, strlen(user), 0) < 0) {
-//        memset(&username[0], 0, sizeof(username));
         syslog(LOG_ERR, "Failed to send user to server.");
         puts("Failed to send user to server. Exiting...");
         exit(EXIT_FAILURE);
     }
-//    memset(&username[0], 0, sizeof(username));
 
     if (recv(sock, server_reply, 2000 , 0) < 0) {
         syslog(LOG_ERR, "Failed to retrieve confirmation from server.");
@@ -84,7 +82,7 @@ int main(int argc , char *argv[]) {
         exit(EXIT_FAILURE);
     }
     if (strcmp(server_reply, "OK") != 0) {
-        puts("Failed to send login");
+        puts("Failed login");
         puts(server_reply);
         exit(EXIT_FAILURE);
     }
