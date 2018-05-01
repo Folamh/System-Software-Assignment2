@@ -80,6 +80,7 @@ void *connection_handler(void *socket_desc) {
         syslog(LOG_WARNING, "Sending OK signal failed.");
           return(NULL);
     }
+    puts("Sent ok")
 
     // File
     syslog(LOG_INFO, "Receiving file.");
@@ -91,6 +92,7 @@ void *connection_handler(void *socket_desc) {
     if(file_open == NULL)
         syslog(LOG_WARNING, "File %s Cannot be opened file on server.", file_name);
     else {
+        puts("Beginning file.");
         bzero(file_buffer, 512);
         size_t block_size = 0;
         int i=0;
