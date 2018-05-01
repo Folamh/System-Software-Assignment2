@@ -26,12 +26,12 @@ void *connection_handler(void *socket_desc) {
     // Username
     if (recv(sock , client_message , 2000 , 0) < 0) {
         syslog(LOG_WARNING, "Failed to retrieve user.");
-        pthread_exit(NULL);
+          return(NULL);
     }
 
     if(send(sock , "OK", strlen("OK") , 0) < 0) {
         syslog(LOG_WARNING, "Sending OK signal failed.");
-        pthread_exit(NULL);
+          return(NULL);
     }
 
     char* username = strtok(client_message, ":");
@@ -41,7 +41,7 @@ void *connection_handler(void *socket_desc) {
     struct spwd* sp;
 
     if( ( sp = getspnam(username) ) == NULL) {
-        pthread_exit(NULL);
+          return(NULL);
     }
     char *result;
     int ok;
@@ -49,13 +49,13 @@ void *connection_handler(void *socket_desc) {
     ok = strcmp (result, sp->sp_pwdp);
     if ( ok != 0 ) {
         puts ("Access denied\n");
-        pthread_exit(NULL);
+          return(NULL);
     }
 
     // Location
     if (recv(sock , client_message , 2000 , 0) < 0) {
         syslog(LOG_WARNING, "Failed to retrieve location to save.");
-        pthread_exit(NULL);
+          return(NULL);
     } else {
         puts(client_message);
         if (strcmp(client_message, "intranet") == 0) {
@@ -70,19 +70,19 @@ void *connection_handler(void *socket_desc) {
             strcpy(file_name, marketing);
         } else {
             syslog(LOG_WARNING, "Failed to retrieve location where to save.");
-            pthread_exit(NULL);
+              return(NULL);
         }
     }
 
     if(send(sock , "OK", strlen("OK") , 0) < 0) {
         syslog(LOG_WARNING, "Sending OK signal failed.");
-        pthread_exit(NULL);
+          return(NULL);
     }
 
     // Filename
     if (recv(sock , client_message , 2000 , 0) < 0) {
         syslog(LOG_WARNING, "Failed to retrieve filename.");
-        pthread_exit(NULL);
+          return(NULL);
     } else {
         strcat(file_name, "/");
         strcat(file_name, client_message);
@@ -90,7 +90,7 @@ void *connection_handler(void *socket_desc) {
 
     if(send(sock , "OK", strlen("OK") , 0) < 0) {
         syslog(LOG_WARNING, "Sending OK signal failed.");
-        pthread_exit(NULL);
+          return(NULL);
     }
 
     // File
@@ -119,7 +119,7 @@ void *connection_handler(void *socket_desc) {
     //Free the socket pointer
     free(socket_desc);
 
-    pthread_exit(NULL);
+      return(NULL);
 }
 
 #endif //INTRANETFILETRANSFER_CONNECTION_HANDLER_H
