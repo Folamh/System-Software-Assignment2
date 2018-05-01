@@ -19,6 +19,8 @@ void *connection_handler(void *socket_desc) {
     char* marketing = "/usr/intranet/marketing";
     char file_name[2000];
 
+    puts("did we even make it?");
+
     //Get the socket descriptor
     int sock = *(int*)socket_desc;
     char client_message[2000];
