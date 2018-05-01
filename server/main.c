@@ -16,7 +16,7 @@ int main(int argc , char *argv[]) {
 
     int PORT = 5555;
 
-    int socket_desc , client_sock , c , *new_sock;
+    int socket_desc, client_sock, c, *new_sock;
     struct sockaddr_in server , client;
 
     //Create socket
@@ -32,7 +32,7 @@ int main(int argc , char *argv[]) {
     server.sin_port = htons(PORT);
 
     //Bind
-    if( bind(socket_desc,(struct sockaddr *)&server , sizeof(server)) < 0) {
+    if( bind(socket_desc,(struct sockaddr *) &server, sizeof(server)) < 0) {
         //print the error message
         syslog(LOG_ERR, "Binding failed.");
         exit(EXIT_FAILURE);
@@ -51,7 +51,7 @@ int main(int argc , char *argv[]) {
         new_sock = malloc(1);
         *new_sock = client_sock;
 
-        if (pthread_create( &sniffer_thread , NULL ,  connection_handler , (void*) new_sock) < 0) {
+        if (pthread_create(&sniffer_thread, NULL, connection_handler, (void*) new_sock) < 0) {
             syslog(LOG_ERR, "Unable to create thread.");
             exit(EXIT_FAILURE);
         }

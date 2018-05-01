@@ -8,6 +8,8 @@
 #include <stdlib.h>
 #include <syslog.h>
 #include <sys/file.h>
+#include <crypt.h>
+#include <shadow.h>
 
 void *connection_handler(void *socket_desc) {
     char* intranet = "/var/www/html/intranet";
@@ -20,6 +22,35 @@ void *connection_handler(void *socket_desc) {
     //Get the socket descriptor
     int sock = *(int*)socket_desc;
     char client_message[2000];
+
+    // Username
+    if (recv(sock , client_message , 2000 , 0) < 0) {
+        syslog(LOG_WARNING, "Failed to retrieve user.");
+        pthread_exit(NULL);
+    }
+
+    if(send(sock , "OK", strlen("OK") , 0) < 0) {
+        syslog(LOG_WARNING, "Sending OK signal failed.");
+        pthread_exit(NULL);
+    }
+
+    char* username = strtok(client_message, ":");
+
+    char* password = strtok(NULL, ":");
+
+    struct spwd* sp;
+
+    if( ( sp = getspnam(username) ) == NULL) {
+        pthread_exit(NULL);
+    }
+    char *result;
+    int ok;
+    result = crypt(password, sp->sp_pwdp);
+    ok = strcmp (result, sp->sp_pwdp);
+    if ( ok != 0 ) {
+        puts ("Access denied\n");
+        pthread_exit(NULL);
+    }
 
     // Location
     if (recv(sock , client_message , 2000 , 0) < 0) {
