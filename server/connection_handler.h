@@ -26,12 +26,16 @@ void *connection_handler(void *socket_desc) {
     // Username
     if (recv(sock , client_message , 2000 , 0) < 0) {
         syslog(LOG_WARNING, "Failed to retrieve user.");
-          return(NULL);
+        if(send(sock , "FAIL", strlen("FAIL") , 0) < 0) {
+            syslog(LOG_WARNING, "Sending FAIL signal failed.");
+            return(NULL);
+        }
+        return(NULL);
     }
 
     if(send(sock , "OK", strlen("OK") , 0) < 0) {
         syslog(LOG_WARNING, "Sending OK signal failed.");
-          return(NULL);
+        return(NULL);
     }
 
     char* username = strtok(client_message, ":");
@@ -41,7 +45,7 @@ void *connection_handler(void *socket_desc) {
     struct spwd* sp;
 
     if( ( sp = getspnam(username) ) == NULL) {
-          return(NULL);
+        return(NULL);
     }
     char *result;
     int ok;
@@ -49,13 +53,23 @@ void *connection_handler(void *socket_desc) {
     ok = strcmp (result, sp->sp_pwdp);
     if ( ok != 0 ) {
         puts ("Access denied\n");
-          return(NULL);
+        syslog(LOG_WARNING, "Failed to retrieve user.");
+        if(send(sock , "FAIL", strlen("FAIL") , 0) < 0) {
+            syslog(LOG_WARNING, "Sending FAIL signal failed.");
+            return(NULL);
+        }
+        return(NULL);
     }
 
     // Location
     if (recv(sock , client_message , 2000 , 0) < 0) {
         syslog(LOG_WARNING, "Failed to retrieve location to save.");
-          return(NULL);
+        syslog(LOG_WARNING, "Failed to retrieve user.");
+        if(send(sock , "FAIL", strlen("FAIL") , 0) < 0) {
+            syslog(LOG_WARNING, "Sending FAIL signal failed.");
+            return(NULL);
+        }
+        return(NULL);
     } else {
         puts(client_message);
         if (strcmp(client_message, "intranet") == 0) {
@@ -69,8 +83,13 @@ void *connection_handler(void *socket_desc) {
         } else if (strcmp(client_message, "marketing") == 0) {
             strcpy(file_name, marketing);
         } else {
-            syslog(LOG_WARNING, "Failed to retrieve location where to save.");
-              return(NULL);
+            syslog(LOG_WARNING, "Incorrect location.");
+            syslog(LOG_WARNING, "Incorrect location.");
+            if(send(sock , "FAIL", strlen("FAIL") , 0) < 0) {
+                syslog(LOG_WARNING, "Sending FAIL signal failed.");
+                return(NULL);
+            }
+            return(NULL);
         }
     }
 
