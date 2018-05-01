@@ -42,7 +42,7 @@ void *connection_handler(void *socket_desc) {
 
     struct spwd* sp;
 
-    puts("Hello?")
+    puts("Hello?");
     if( ( sp = getspnam(username) ) == NULL) {
         return(NULL);
     }
