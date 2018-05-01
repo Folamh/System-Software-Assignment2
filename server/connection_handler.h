@@ -19,8 +19,6 @@ void *connection_handler(void *socket_desc) {
     char* marketing = "/usr/intranet/marketing";
     char file_name[2000];
 
-    puts("did we even make it?");
-
     //Get the socket descriptor
     int sock = *(int*)socket_desc;
     char client_message[2000];
@@ -34,7 +32,6 @@ void *connection_handler(void *socket_desc) {
         }
         return(NULL);
     }
-    puts("Hello?");
 
     char token[300];
     strcpy(token, client_message);
@@ -49,7 +46,6 @@ void *connection_handler(void *socket_desc) {
     if( ( sp = getspnam(username) ) == NULL) {
         return(NULL);
     }
-    puts("Hi");
     char *result;
     int ok;
     result = crypt(password, sp->sp_pwdp);
@@ -78,26 +74,26 @@ void *connection_handler(void *socket_desc) {
             return(NULL);
         }
         return(NULL);
+    }
+
+    syslog(LOG_DEBUG, "%s", client_message);
+    if (strcmp(client_message, "intranet") == 0) {
+        strcpy(file_name, intranet);
+    } else if (strcmp(client_message, "sales") == 0) {
+        strcpy(file_name, sales);
+    } else if (strcmp(client_message, "promotions") == 0) {
+        strcpy(file_name, promotions);
+    } else if (strcmp(client_message, "offers") == 0) {
+        strcpy(file_name, offers);
+    } else if (strcmp(client_message, "marketing") == 0) {
+        strcpy(file_name, marketing);
     } else {
-        syslog(LOG_DEBUG, "%s", client_message);
-        if (strcmp(client_message, "intranet") == 0) {
-            strcpy(file_name, intranet);
-        } else if (strcmp(client_message, "sales") == 0) {
-            strcpy(file_name, sales);
-        } else if (strcmp(client_message, "promotions") == 0) {
-            strcpy(file_name, promotions);
-        } else if (strcmp(client_message, "offers") == 0) {
-            strcpy(file_name, offers);
-        } else if (strcmp(client_message, "marketing") == 0) {
-            strcpy(file_name, marketing);
-        } else {
-            syslog(LOG_WARNING, "Incorrect location.");
-            if(send(sock , "FAIL", strlen("FAIL") , 0) < 0) {
-                syslog(LOG_WARNING, "Sending FAIL signal failed.");
-                return(NULL);
-            }
+        syslog(LOG_WARNING, "Incorrect location.");
+        if(send(sock , "FAIL", strlen("FAIL") , 0) < 0) {
+            syslog(LOG_WARNING, "Sending FAIL signal failed.");
             return(NULL);
         }
+        return(NULL);
     }
 
     if(send(sock , "OK", strlen("OK") , 0) < 0) {
