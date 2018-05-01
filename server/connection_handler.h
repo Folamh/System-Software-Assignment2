@@ -1,6 +1,7 @@
 #ifndef INTRANETFILETRANSFER_CONNECTION_HANDLER_H
 #define INTRANETFILETRANSFER_CONNECTION_HANDLER_H
 
+#define _GNU_SOURCE
 #include <stdio.h>
 #include <string.h>
 #include <sys/socket.h>
