@@ -74,7 +74,7 @@ void *connection_handler(void *socket_desc) {
         }
         return(NULL);
     } else {
-        syslog(LOG_DEBUG, client_message);
+        syslog(LOG_DEBUG, "%s", client_message);
         if (strcmp(client_message, "intranet") == 0) {
             strcpy(file_name, intranet);
         } else if (strcmp(client_message, "sales") == 0) {
@@ -105,7 +105,7 @@ void *connection_handler(void *socket_desc) {
         syslog(LOG_WARNING, "Failed to retrieve filename.");
           return(NULL);
     } else {
-        syslog(LOG_DEBUG, client_message);
+        syslog(LOG_DEBUG, "%s", client_message);
         strcat(file_name, "/");
         strcat(file_name, client_message);
     }
