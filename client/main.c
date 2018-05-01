@@ -69,8 +69,8 @@ int main(int argc , char *argv[]) {
         exit(EXIT_FAILURE);
     }
 
-    if (strcmp(server_reply, "Unauthorized") == 0) {
-        puts("Unauthorized credentials. Exiting...");
+    if (strcmp(server_reply, "Authorized") != 0) {
+        puts("Incorrect credentials or save location. Exiting...");
         exit(EXIT_FAILURE);
     }
 

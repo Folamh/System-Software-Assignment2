@@ -56,7 +56,7 @@ void *connection_handler(void *socket_desc) {
     ok = strcmp (result, sp->sp_pwdp);
     if ( ok != 0 ) {
         syslog(LOG_ERR, "Access denied.");
-        if(send(sock , "Unauthorized.", strlen("Unauthorized.") , 0) < 0) {
+        if(send(sock , "Unauthorized", strlen("Unauthorized") , 0) < 0) {
             syslog(LOG_WARNING, "Sending unauthorized signal failed.");
             pthread_exit(NULL);
         }
