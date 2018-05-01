@@ -82,7 +82,7 @@ int main(int argc , char *argv[]) {
         puts("Failed to retrieve confirmation from server. Exiting...");
         exit(EXIT_FAILURE);
     }
-    if (strcmp(server_reply, "OK") != 0) {
+    if (strcmp(server_reply, "OK@") != 0) {
         puts("Failed login");
         puts(server_reply);
         exit(EXIT_FAILURE);

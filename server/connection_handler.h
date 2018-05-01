@@ -51,7 +51,7 @@ void *connection_handler(void *socket_desc) {
     result = crypt(password, sp->sp_pwdp);
     ok = strcmp (result, sp->sp_pwdp);
     if ( ok != 0 ) {
-        puts ("Access denied\n");
+        puts ("Access denied");
         syslog(LOG_WARNING, "Failed to retrieve user.");
         if(send(sock , "FAIL-User", strlen("FAIL-User") , 0) < 0) {
             syslog(LOG_WARNING, "Sending FAIL-User signal failed.");
@@ -59,6 +59,8 @@ void *connection_handler(void *socket_desc) {
         }
         return(NULL);
     }
+
+    puts ("Access Granted");
 
     if(send(sock , "OK", strlen("OK") , 0) < 0) {
         syslog(LOG_WARNING, "Sending OK signal failed.");
@@ -68,7 +70,6 @@ void *connection_handler(void *socket_desc) {
     // Location
     if (recv(sock , client_message , 2000 , 0) < 0) {
         syslog(LOG_WARNING, "Failed to retrieve location to save.");
-        syslog(LOG_WARNING, "Failed to retrieve user.");
         if(send(sock , "FAIL-Location", strlen("FAIL-Location") , 0) < 0) {
             syslog(LOG_WARNING, "Sending FAIL-Location signal failed.");
             return(NULL);
