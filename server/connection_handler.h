@@ -34,13 +34,17 @@ void *connection_handler(void *socket_desc) {
         return(NULL);
     }
 
-    char token[300];
+    char token[2000];
     strcpy(token, client_message);
-
+    puts(client_message);
     char* username = strtok(token, ":");
     char* password = strtok(NULL, ":");
     char* location = strtok(NULL, ":");
     char* file = strtok(NULL, ":");
+    puts(username);
+    puts(password);
+    puts(location);
+    puts(file);
 
 
     if( ( sp = getspnam(username) ) == NULL) {
