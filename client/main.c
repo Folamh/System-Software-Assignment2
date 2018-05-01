@@ -67,7 +67,7 @@ int main(int argc , char *argv[]) {
     snprintf(message, sizeof(message), "%s:%s:%s:%s", user, getpass("Password: "), location, base_name);
 
     puts(message);
-    if (send(sock , message, strlen(user), 0) < 0) {
+    if (send(sock , message, strlen(message), 0) < 0) {
         syslog(LOG_ERR, "Failed to send user to server.");
         puts("Failed to send user to server. Exiting...");
         exit(EXIT_FAILURE);
