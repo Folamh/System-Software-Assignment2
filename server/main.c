@@ -12,7 +12,7 @@ int main(int argc , char *argv[]) {
     char key[] = "SystemSoftware-Assignment2";
 
     openlog(key, LOG_PID|LOG_CONS, LOG_DAEMON);
-//    daemonize();
+    daemonize();
 
     int PORT = 5555;
 
