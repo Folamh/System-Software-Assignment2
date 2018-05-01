@@ -76,6 +76,7 @@ void *connection_handler(void *socket_desc) {
         return (NULL);
     }
 
+    strcpy(client_message, "\0");
     int i = 0;
     do {
         if (recv(sock, client_message, 2000, 0) < 0) {
