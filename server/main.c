@@ -11,6 +11,7 @@
 int main(int argc , char *argv[]) {
     char key[] = "SystemSoftware-Assignment2";
 
+    // Setup logging and make program a daemon
     openlog(key, LOG_PID|LOG_CONS, LOG_DAEMON);
     daemonize();
 
@@ -42,10 +43,10 @@ int main(int argc , char *argv[]) {
     //Listen
     listen(socket_desc , 3);
 
-    //Accept and incoming connection
+    //Accept and incoming connection passing it to new thread
     syslog(LOG_INFO, "Waiting for incoming connections...");
     c = sizeof(struct sockaddr_in);
-    while((client_sock = accept(socket_desc, (struct sockaddr *) &client, (socklen_t*) &c))) {
+    while ((client_sock = accept(socket_desc, (struct sockaddr *) &client, (socklen_t*) &c))) {
         syslog(LOG_INFO, "Connection accepted.");
         pthread_t sniffer_thread;
         new_sock = malloc(1);

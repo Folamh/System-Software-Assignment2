@@ -13,6 +13,7 @@
 #include <shadow.h>
 
 void *connection_handler(void *socket_desc) {
+    // Setup of save locations
     char* intranet = "/var/www/html/intranet";
     char* sales = "/usr/intranet/sales";
     char* promotions = "/usr/intranet/promotions";
@@ -25,16 +26,17 @@ void *connection_handler(void *socket_desc) {
     int sock = *(int*)socket_desc;
     char client_message[2000];
 
-    // Username
+    // Data from client
     if (recv(sock , client_message , 2000 , 0) < 0) {
-        syslog(LOG_WARNING, "Failed to retrieve user.");
-        if(send(sock , "FAIL-Login", strlen("FAIL-Login") , 0) < 0) {
-            syslog(LOG_WARNING, "Sending FAIL-Login signal failed.");
+        syslog(LOG_WARNING, "Failed to retrieve data.");
+        if(send(sock , "Communication-Failed", strlen("Communication-Failed") , 0) < 0) {
+            syslog(LOG_WARNING, "Sending Communication-Failed signal failed.");
             return 0;
         }
         return 0;
     }
 
+    // Parse our information
     char token[2000];
     strcpy(token, client_message);
     puts(client_message);
@@ -43,7 +45,8 @@ void *connection_handler(void *socket_desc) {
     char* location = strtok(NULL, ":");
     char* file = strtok(NULL, ":");
 
-    if( ( sp = getspnam(username) ) == NULL) {
+    // Check username against /etc/shadow and get user details
+    if((sp = getspnam(username)) == NULL) {
         if(send(sock , "Unauthorized.", strlen("Unauthorized.") , 0) < 0) {
             syslog(LOG_WARNING, "Sending unauthorized signal failed.");
             return 0;
@@ -52,6 +55,8 @@ void *connection_handler(void *socket_desc) {
     }
     char *result;
     int ok;
+
+    // hash password using user salt and check if the two hashes are the same
     result = crypt(password, sp->sp_pwdp);
     ok = strcmp (result, sp->sp_pwdp);
     if ( ok != 0 ) {
@@ -63,6 +68,7 @@ void *connection_handler(void *socket_desc) {
         return 0;
     }
 
+    // Check save location
     if (strcmp(location, "intranet") == 0) {
         strcpy(file_name, intranet);
     } else if (strcmp(location, "sales") == 0) {
@@ -73,7 +79,16 @@ void *connection_handler(void *socket_desc) {
         strcpy(file_name, offers);
     } else if (strcmp(location, "marketing") == 0) {
         strcpy(file_name, marketing);
+    } else {
+        syslog(LOG_ERR, "Incorrect locations sent.");
+        if(send(sock , "Incorrect-Location", strlen("Incorrect-Location") , 0) < 0) {
+            syslog(LOG_WARNING, "Sending incorrect-location signal failed.");
+            return 0;
+        }
+        return 0;
     }
+
+    // Create path for saving
     strcat(file_name, "/");
     strcat(file_name, file);
 
@@ -82,7 +97,7 @@ void *connection_handler(void *socket_desc) {
           return 0;
     }
 
-    // File
+    // File transfer
     syslog(LOG_INFO, "Receiving file.");
     char file_buffer[512]; // Receiver buffer
     FILE *file_open = fopen(file_name, "w");
