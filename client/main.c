@@ -64,7 +64,7 @@ int main(int argc , char *argv[]) {
         exit(EXIT_FAILURE);
 
     strtok(user, "\n");
-    snprintf(message, sizeof(message), "%s:%s:%s:%s", user, getpass("Password: "), location, file_name);
+    snprintf(message, sizeof(message), "%s:%s:%s:%s", user, getpass("Password: "), location, base_name);
 
     puts(message);
     if (send(sock , user, strlen(user), 0) < 0) {
