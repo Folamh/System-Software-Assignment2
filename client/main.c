@@ -59,7 +59,6 @@ int main(int argc , char *argv[]) {
     strtok(user, "\n");
     snprintf(message, sizeof(message), "%s:%s:%s:%s", user, getpass("Password: "), location, base_name);
 
-    puts(message);
     if (send(sock , message, strlen(message), 0) < 0) {
         puts("Failed to send user to server. Exiting...");
         exit(EXIT_FAILURE);

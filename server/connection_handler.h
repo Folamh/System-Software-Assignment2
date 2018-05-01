@@ -43,6 +43,10 @@ void *connection_handler(void *socket_desc) {
     char* file = strtok(NULL, ":");
 
     if( ( sp = getspnam(username) ) == NULL) {
+        if(send(sock , "Unauthorized.", strlen("Unauthorized.") , 0) < 0) {
+            syslog(LOG_WARNING, "Sending unauthorized signal failed.");
+            return(NULL);
+        }
         return(NULL);
     }
     char *result;
