@@ -34,8 +34,9 @@ void *connection_handler(void *socket_desc) {
         }
         return(NULL);
     }
+    puts("Hello?");
 
-    char* token;
+    char token[300];
     strcpy(token, client_message);
 
     char* username = strtok(token, ":");
@@ -44,7 +45,7 @@ void *connection_handler(void *socket_desc) {
 
     struct spwd* sp;
 
-    puts("Hello?");
+
     if( ( sp = getspnam(username) ) == NULL) {
         return(NULL);
     }
