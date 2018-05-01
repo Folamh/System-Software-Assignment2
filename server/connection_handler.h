@@ -42,9 +42,11 @@ void *connection_handler(void *socket_desc) {
 
     struct spwd* sp;
 
+    puts("Hello?")
     if( ( sp = getspnam(username) ) == NULL) {
         return(NULL);
     }
+    puts("Hi");
     char *result;
     int ok;
     result = crypt(password, sp->sp_pwdp);
