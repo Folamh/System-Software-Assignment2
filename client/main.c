@@ -32,7 +32,7 @@ int main(int argc , char *argv[]) {
 
     int sock;
     struct sockaddr_in server;
-    char server_reply[2000];
+    char server_reply[2000], message[2000];
 
     //Create socket
     sock = socket(AF_INET , SOCK_STREAM , 0);
@@ -64,13 +64,9 @@ int main(int argc , char *argv[]) {
         exit(EXIT_FAILURE);
 
     strtok(user, "\n");
-    strcat(user, ":");
-    strcat(user, getpass("Password: "));
+    snprintf(message, sizeof(message), "%s:%s:%s:%s", user, getpass("Password: "), location, file_name);
 
-    puts(user);
-
-    // Login
-    puts("Sending user");
+    puts(message);
     if (send(sock , user, strlen(user), 0) < 0) {
         syslog(LOG_ERR, "Failed to send user to server.");
         puts("Failed to send user to server. Exiting...");
@@ -80,50 +76,6 @@ int main(int argc , char *argv[]) {
     if (recv(sock, server_reply, 2000 , 0) < 0) {
         syslog(LOG_ERR, "Failed to retrieve confirmation from server.");
         puts("Failed to retrieve confirmation from server. Exiting...");
-        exit(EXIT_FAILURE);
-    }
-    if (strcmp(server_reply, "OK@") != 0) {
-        puts("Failed login");
-        puts(server_reply);
-        exit(EXIT_FAILURE);
-    }
-
-    // Save location
-    puts("Sending location.");
-    if (send(sock , location, strlen(location), 0) < 0) {
-        syslog(LOG_ERR, "Error sending save location to server.");
-        puts("Error sending save location to server. Exiting...");
-        exit(EXIT_FAILURE);
-    }
-
-    if (recv(sock, server_reply, 2000 , 0) < 0) {
-        syslog(LOG_ERR, "Failed to retrieve confirmation from server.");
-        puts("Failed to retrieve confirmation from server. Exiting...");
-        exit(EXIT_FAILURE);
-    }
-    if (strcmp(server_reply, "OK") != 0) {
-        syslog(LOG_ERR, "Retrieved incorrect confirmation from server.");
-        puts("Retrieved incorrect confirmation from server. Exiting...");
-        puts(server_reply);
-        exit(EXIT_FAILURE);
-    }
-
-    // Filename
-    if (send(sock , base_name, strlen(base_name), 0) < 0) {
-        syslog(LOG_ERR, "Error sending save location to server.");
-        puts("Error sending save location to server.");
-        exit(EXIT_FAILURE);
-    }
-
-    if (recv(sock, server_reply, 2000 , 0) < 0) {
-        syslog(LOG_ERR, "Failed to retrieve confirmation from server.");
-        puts("Failed to retrieve confirmation from server. Exiting...");
-        exit(EXIT_FAILURE);
-    }
-    if (strcmp(server_reply, "OK") != 0) {
-        syslog(LOG_ERR, "Retrieved incorrect confirmation from server.");
-        puts("Retrieved incorrect confirmation from server. Exiting...");
-        puts(server_reply);
         exit(EXIT_FAILURE);
     }
 

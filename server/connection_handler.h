@@ -18,6 +18,7 @@ void *connection_handler(void *socket_desc) {
     char* offers = "/usr/intranet/offers";
     char* marketing = "/usr/intranet/marketing";
     char file_name[2000];
+    struct spwd* sp;
 
     //Get the socket descriptor
     int sock = *(int*)socket_desc;
@@ -37,10 +38,9 @@ void *connection_handler(void *socket_desc) {
     strcpy(token, client_message);
 
     char* username = strtok(token, ":");
-
     char* password = strtok(NULL, ":");
-
-    struct spwd* sp;
+    char* location = strtok(NULL, ":");
+    char* file = strtok(NULL, ":");
 
 
     if( ( sp = getspnam(username) ) == NULL) {
@@ -52,65 +52,23 @@ void *connection_handler(void *socket_desc) {
     ok = strcmp (result, sp->sp_pwdp);
     if ( ok != 0 ) {
         puts ("Access denied");
-        syslog(LOG_WARNING, "Failed to retrieve user.");
-        if(send(sock , "FAIL-User", strlen("FAIL-User") , 0) < 0) {
-            syslog(LOG_WARNING, "Sending FAIL-User signal failed.");
-            return(NULL);
-        }
         return(NULL);
     }
+    puts("Access granted.");
 
-    puts ("Access Granted");
-
-    if(send(sock , "OK", strlen("OK") , 0) < 0) {
-        syslog(LOG_WARNING, "Sending OK signal failed.");
-        return(NULL);
-    }
-
-    // Location
-    if (recv(sock , client_message , 2000 , 0) < 0) {
-        syslog(LOG_WARNING, "Failed to retrieve location to save.");
-        if(send(sock , "FAIL-Location", strlen("FAIL-Location") , 0) < 0) {
-            syslog(LOG_WARNING, "Sending FAIL-Location signal failed.");
-            return(NULL);
-        }
-        return(NULL);
-    }
-
-    syslog(LOG_DEBUG, "%s", client_message);
-    if (strcmp(client_message, "intranet") == 0) {
+    if (strcmp(location, "intranet") == 0) {
         strcpy(file_name, intranet);
-    } else if (strcmp(client_message, "sales") == 0) {
+    } else if (strcmp(location, "sales") == 0) {
         strcpy(file_name, sales);
-    } else if (strcmp(client_message, "promotions") == 0) {
+    } else if (strcmp(location, "promotions") == 0) {
         strcpy(file_name, promotions);
-    } else if (strcmp(client_message, "offers") == 0) {
+    } else if (strcmp(location, "offers") == 0) {
         strcpy(file_name, offers);
-    } else if (strcmp(client_message, "marketing") == 0) {
+    } else if (strcmp(location, "marketing") == 0) {
         strcpy(file_name, marketing);
-    } else {
-        syslog(LOG_WARNING, "Incorrect location.");
-        if(send(sock , "FAIL", strlen("FAIL") , 0) < 0) {
-            syslog(LOG_WARNING, "Sending FAIL signal failed.");
-            return(NULL);
-        }
-        return(NULL);
     }
-
-    if(send(sock , "OK", strlen("OK") , 0) < 0) {
-        syslog(LOG_WARNING, "Sending OK signal failed.");
-          return(NULL);
-    }
-
-    // Filename
-    if (recv(sock , client_message , 2000 , 0) < 0) {
-        syslog(LOG_WARNING, "Failed to retrieve filename.");
-          return(NULL);
-    } else {
-        syslog(LOG_DEBUG, "%s", client_message);
-        strcat(file_name, "/");
-        strcat(file_name, client_message);
-    }
+    strcat(file_name, "/");
+    strcat(file_name, file);
 
     if(send(sock , "OK", strlen("OK") , 0) < 0) {
         syslog(LOG_WARNING, "Sending OK signal failed.");
