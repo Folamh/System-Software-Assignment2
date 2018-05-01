@@ -57,20 +57,20 @@ int main(int argc , char *argv[]) {
     syslog(LOG_INFO, "Connected to server.");
     puts("Connected to server.");
 
-    char username[300];
+    char user[300];
     printf("Username: ");
     fflush(stdout);
-    if (fgets(username, 300, stdin) == NULL)
+    if (fgets(user, 300, stdin) == NULL)
         exit(EXIT_FAILURE);
 
-    strtok(username, "\n");
-    strcat(username, ":");
-    strcat(username, getpass("Password: "));
+    strtok(user, "\n");
+    strcat(user, ":");
+    strcat(user, getpass("Password: "));
 
-    puts(username);
+    puts(user);
 
     // Login
-    if (send(sock , username, strlen(username), 0) < 0) {
+    if (send(sock , user, strlen(user), 0) < 0) {
 //        memset(&username[0], 0, sizeof(username));
         syslog(LOG_ERR, "Failed to send user to server.");
         puts("Failed to send user to server. Exiting...");

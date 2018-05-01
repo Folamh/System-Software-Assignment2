@@ -33,7 +33,7 @@ void *connection_handler(void *socket_desc) {
         return(NULL);
     }
 
-    if(send(sock , "OK", strlen("OK") , 0) < 0) {
+    if(send(sock , "hello", strlen("hello") , 0) < 0) {
         syslog(LOG_WARNING, "Sending OK signal failed.");
         return(NULL);
     }
