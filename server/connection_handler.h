@@ -80,7 +80,7 @@ void *connection_handler(void *socket_desc) {
         syslog(LOG_WARNING, "Sending OK signal failed.");
           return(NULL);
     }
-    puts("Sent ok")
+    puts("Sent ok");
 
     // File
     syslog(LOG_INFO, "Receiving file.");
