@@ -63,6 +63,7 @@ int main(int argc , char *argv[]) {
     if (fgets(username, 300, stdin) == NULL)
         exit(EXIT_FAILURE);
 
+    strtok(username, "\n");
     strcat(username, ":");
     strcat(username, getpass("Password: "));
 
