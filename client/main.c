@@ -66,6 +66,8 @@ int main(int argc , char *argv[]) {
     strcat(username, ":");
     strcat(username, getpass("Password: "));
 
+    puts(username);
+
     // Login
     if (send(sock , username, strlen(username), 0) < 0) {
         memset(&username[0], 0, sizeof(username));
