@@ -26,8 +26,8 @@ void *connection_handler(void *socket_desc) {
     // Username
     if (recv(sock , client_message , 2000 , 0) < 0) {
         syslog(LOG_WARNING, "Failed to retrieve user.");
-        if(send(sock , "FAIL", strlen("FAIL") , 0) < 0) {
-            syslog(LOG_WARNING, "Sending FAIL signal failed.");
+        if(send(sock , "FAIL-Login", strlen("FAIL-Login") , 0) < 0) {
+            syslog(LOG_WARNING, "Sending FAIL-Login signal failed.");
             return(NULL);
         }
         return(NULL);
@@ -54,8 +54,8 @@ void *connection_handler(void *socket_desc) {
     if ( ok != 0 ) {
         puts ("Access denied\n");
         syslog(LOG_WARNING, "Failed to retrieve user.");
-        if(send(sock , "FAIL", strlen("FAIL") , 0) < 0) {
-            syslog(LOG_WARNING, "Sending FAIL signal failed.");
+        if(send(sock , "FAIL-User", strlen("FAIL-User") , 0) < 0) {
+            syslog(LOG_WARNING, "Sending FAIL-User signal failed.");
             return(NULL);
         }
         return(NULL);
@@ -65,8 +65,8 @@ void *connection_handler(void *socket_desc) {
     if (recv(sock , client_message , 2000 , 0) < 0) {
         syslog(LOG_WARNING, "Failed to retrieve location to save.");
         syslog(LOG_WARNING, "Failed to retrieve user.");
-        if(send(sock , "FAIL", strlen("FAIL") , 0) < 0) {
-            syslog(LOG_WARNING, "Sending FAIL signal failed.");
+        if(send(sock , "FAIL-Location", strlen("FAIL-Location") , 0) < 0) {
+            syslog(LOG_WARNING, "Sending FAIL-Location signal failed.");
             return(NULL);
         }
         return(NULL);
