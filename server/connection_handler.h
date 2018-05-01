@@ -74,6 +74,8 @@ void *connection_handler(void *socket_desc) {
     strcat(file_name, "/");
     strcat(file_name, file);
 
+    puts(file_name);
+
     if(send(sock , "OK", strlen("OK") , 0) < 0) {
         syslog(LOG_WARNING, "Sending OK signal failed.");
           return(NULL);
