@@ -84,6 +84,7 @@ int main(int argc , char *argv[]) {
     syslog(LOG_INFO, "Sending %s to the Server... ", file_name);
     printf("Sending %s to the Server...\n", file_name);
     FILE *file_open = fopen(file_name, "r");
+    puts("File opened");
     bzero(file_buffer, 512);
     size_t block_size;
     int i = 0;
