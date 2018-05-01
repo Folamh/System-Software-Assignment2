@@ -84,7 +84,7 @@ void *connection_handler(void *socket_desc) {
             strcpy(file_name, marketing);
         } else {
             syslog(LOG_WARNING, "Incorrect location.");
-            syslog(LOG_WARNING, "Incorrect location.");
+            syslog(LOG_WARNING, "Incorrect location");
             if(send(sock , "FAIL", strlen("FAIL") , 0) < 0) {
                 syslog(LOG_WARNING, "Sending FAIL signal failed.");
                 return(NULL);
