@@ -30,9 +30,9 @@ void *connection_handler(void *socket_desc) {
         syslog(LOG_WARNING, "Failed to retrieve user.");
         if(send(sock , "FAIL-Login", strlen("FAIL-Login") , 0) < 0) {
             syslog(LOG_WARNING, "Sending FAIL-Login signal failed.");
-            pthread_exit(NULL);
+            return 0;
         }
-        pthread_exit(NULL);
+        return 0;
     }
 
     char token[2000];
@@ -46,9 +46,9 @@ void *connection_handler(void *socket_desc) {
     if( ( sp = getspnam(username) ) == NULL) {
         if(send(sock , "Unauthorized.", strlen("Unauthorized.") , 0) < 0) {
             syslog(LOG_WARNING, "Sending unauthorized signal failed.");
-            pthread_exit(NULL);
+            return 0;
         }
-        pthread_exit(NULL);
+        return 0;
     }
     char *result;
     int ok;
@@ -58,9 +58,9 @@ void *connection_handler(void *socket_desc) {
         syslog(LOG_ERR, "Access denied.");
         if(send(sock , "Unauthorized", strlen("Unauthorized") , 0) < 0) {
             syslog(LOG_WARNING, "Sending unauthorized signal failed.");
-            pthread_exit(NULL);
+            return 0;
         }
-        pthread_exit(NULL);
+        return 0;
     }
 
     if (strcmp(location, "intranet") == 0) {
@@ -79,7 +79,7 @@ void *connection_handler(void *socket_desc) {
 
     if(send(sock , "Authorized", strlen("Authorized") , 0) < 0) {
         syslog(LOG_WARNING, "Sending authorized signal failed.");
-          pthread_exit(NULL);
+          return 0;
     }
 
     // File
@@ -109,7 +109,7 @@ void *connection_handler(void *socket_desc) {
     //Free the socket pointer
     free(socket_desc);
 
-    pthread_exit(NULL);
+    return 0;
 }
 
 #endif //INTRANETFILETRANSFER_CONNECTION_HANDLER_H
