@@ -84,10 +84,10 @@ int main(int argc , char *argv[]) {
     syslog(LOG_INFO, "Sending %s to the Server... ", file_name);
     printf("Sending %s to the Server...\n", file_name);
     FILE *file_open = fopen(file_name, "r");
-    puts("File opened");
     bzero(file_buffer, 512);
     size_t block_size;
     int i = 0;
+    puts("inits ok");
     while((block_size = fread(file_buffer, sizeof(char), 512, file_open)) > 0) {
         printf("Data Sent %d = %zu\n", i, block_size);
         if(send(sock, file_buffer, block_size, 0) < 0) {
