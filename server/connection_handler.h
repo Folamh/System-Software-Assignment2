@@ -85,9 +85,9 @@ void *connection_handler(void *socket_desc) {
     syslog(LOG_INFO, "Receiving file.");
     char file_buffer[512]; // Receiver buffer
     FILE *file_open = fopen(file_name, "w");
-    while (flock(fileno(file_open), LOCK_EX) != 0) {
-        sleep(1);
-    }
+//    while (flock(fileno(file_open), LOCK_EX) != 0) {
+//        sleep(1);
+//    }
     if(file_open == NULL)
         syslog(LOG_WARNING, "File %s Cannot be opened file on server.", file_name);
     else {
@@ -101,7 +101,7 @@ void *connection_handler(void *socket_desc) {
         }
         syslog(LOG_INFO, "Transfer Complete.");
     }
-    flock(fileno(file_open), LOCK_UN);
+//    flock(fileno(file_open), LOCK_UN);
     fclose(file_open);
 
     //Free the socket pointer
